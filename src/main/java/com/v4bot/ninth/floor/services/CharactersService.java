@@ -45,7 +45,10 @@ public class CharactersService {
             PlayableCharacter character = new PlayableCharacter(chosen);
             State state = statesRepository.findById(chosen.getState().getId()).orElse(null);
             if(state!=null) {
-                //
+                State stateCopy = (State) state.clone();
+                stateCopy = statesRepository.save(stateCopy);
+                character.setState(stateCopy);
+                saveCharacter(character);
             } else {
                 log.info("Не удалось скопировать состяние архетипа при создании игрового персонажа для {}",input.getFrom().getUserName());
             }
