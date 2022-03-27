@@ -32,6 +32,7 @@ CREATE TABLE archetypes (
     state_id        INTEGER NOT NULL,
     name            TEXT NOT NULL,
     description     TEXT NOT NULL,
+    code            TEXT NOT NULL,
     play_frequency  INTEGER NOT NULL DEFAULT 0,
     created_at      timestamp default current_timestamp,
     updated_at      timestamp default current_timestamp,

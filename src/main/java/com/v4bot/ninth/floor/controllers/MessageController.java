@@ -27,9 +27,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MessageController extends TelegramLongPollingBot {
 
-    private final ChatPlayersService chatPlayersService;
-    private final CharactersService charactersService;
-    private final ButtonsService buttonsService;
     private final CommandService commandService;
 
     @Override
@@ -57,17 +54,12 @@ public class MessageController extends TelegramLongPollingBot {
                 try {
                     commandService.processCommand(input, message, image);
                 } catch (Exception e) {
-                    log.info("Ошибка при обработке команды /start");
+                    log.info("Ошибка при обработке команды /start", e);
                 }
 
             } else {
                 //todo отображать кнопки
             }
-
-//            chatPlayersService.upsertChatMembersByMessageInfo(input);
-//
-//            charactersService.getNewPlayableCharacter(input, message);
-//            buttonsService.setButtons(message);
 
             try {
                 if(message.getText()!=null) {
@@ -79,10 +71,6 @@ public class MessageController extends TelegramLongPollingBot {
                 e.printStackTrace();
             }
         }
-    }
-
-    public int getRandomNumber(int max) {
-        return (int) (Math.random() * max);
     }
 
     @Override

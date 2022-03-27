@@ -24,12 +24,6 @@ public abstract class AbstractCharacter {
     @JoinColumn(name="state_id")
     private State state;
 
-    @Column(name="name")
-    private String name;
-
-    @Column(name="description")
-    private String description;
-
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

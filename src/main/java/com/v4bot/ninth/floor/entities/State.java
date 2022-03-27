@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class State {
+public class State implements Cloneable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id")
@@ -53,4 +53,16 @@ public class State {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Override
+    public Object clone() {
+        State obj = new State();
+        obj.setStrength(this.strength);
+        obj.setDexterity(this.dexterity);
+        obj.setIq(this.iq);
+        obj.setHealth(this.health);
+        obj.setFatigue(this.fatigue);
+        obj.setCharisma(this.charisma);
+        return obj;
+    }
 }

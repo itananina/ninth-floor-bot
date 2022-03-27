@@ -21,4 +21,13 @@ public class Archetype extends AbstractCharacter {
     @Column(name="play_frequency")
     private Integer playFrequency;
 
+    @Column(name="code")
+    private String code;
+
+    @Column(name="name")
+    private String name;
+
+    @Column(name="description")
+    private String description;
+
 }

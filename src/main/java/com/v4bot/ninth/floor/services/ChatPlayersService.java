@@ -23,7 +23,7 @@ public class ChatPlayersService {
     private final ChatsRepository chatsRepository;
 
     public void upsertChatMembersByMessageInfo(Message input) {
-        Player player = findOrCreatePlayerByUsername(input.getFrom()); //ищем игрока
+        Player player = findOrCreatePlayerByUser(input.getFrom()); //ищем игрока
 
         if(!isNull(player.getChatSet()) && player.getChatSet().stream().noneMatch(chat -> chat.getId().equals(input.getChatId()))) {
             Chat chat = findOrCreateChatById(input.getChat()); //ищем чат
@@ -31,7 +31,7 @@ public class ChatPlayersService {
         }
     }
 
-    public Player findOrCreatePlayerByUsername(User user) {
+    public Player findOrCreatePlayerByUser(User user) {
         return playersRepository.findPlayerByUsername(user.getUserName())
                 .orElseGet(()->playersRepository.save(new Player(user.getUserName(), user.getFirstName(), user.getLastName())));
     }
@@ -50,5 +50,14 @@ public class ChatPlayersService {
 
     public List<Player> findPlayersByChatId(Long chatId) {
         return playersRepository.findPlayersByChatId(chatId);
+    }
+
+    public Player findPlayerByUsername(String username) {
+        return playersRepository.findPlayerByUsername(username)
+                .orElseThrow(()-> new RuntimeException("Не найден игрок с username="+username));
+    }
+
+    public void savePlayer(Player player) {
+        playersRepository.save(player);
     }
 }

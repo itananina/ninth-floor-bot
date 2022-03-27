@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,5 +22,14 @@ public class MissionService {
             return null;
         }
         return missionList.stream().filter(mission -> MissionStatus.Active.equals(mission.getStatus())).findFirst().orElse(null);
+    }
+
+    public MissionStatus getMissionStatusForChat(Long chatId) {
+        List<Mission> missionList = missionsRepository.findAllByChatIdOrderByUpdatedAtDesc(chatId);
+        if(missionList.isEmpty()) {
+            return MissionStatus.Absent;
+        }
+        Optional<Mission> missionOpt = missionList.stream().filter(mission -> MissionStatus.Active.equals(mission.getStatus())).findFirst();
+        return missionOpt.isPresent() ? missionOpt.get().getStatus() : MissionStatus.Finished;
     }
 }
