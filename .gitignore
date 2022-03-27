@@ -1,0 +1,4 @@
+# Project exclude paths
+/target/
+/litebot.db
+/src/main/resources/files/
