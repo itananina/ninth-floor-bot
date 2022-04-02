@@ -2,6 +2,7 @@ package com.v4bot.ninth.floor.services;
 
 import com.v4bot.ninth.floor.data.Context;
 import com.v4bot.ninth.floor.enums.MissionStatus;
+import com.v4bot.ninth.floor.enums.ReplyType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +20,7 @@ import java.util.Objects;
 @Slf4j
 public class CommandService {
 
+    private final ChatPlayersService chatPlayersService;
     private final CharactersService charactersService;
     private final ButtonsService buttonsService;
     private final MissionService missionService;
@@ -35,10 +37,18 @@ public class CommandService {
             case "/getcharacter":
                 processGetCharacterCommand(context, currentStatus);
                 break;
+            case "/changename":
+                processChangeNameCommand(context);
+                break;
             default:
                 break;
         }
 //            buttonsService.setButtons(message);
+    }
+
+    private void processChangeNameCommand(Context context) {
+        chatPlayersService.setPlayerReplyingFlag(context.getPlayer(), true, ReplyType.ChangeName);
+        context.getResponse().setText("Какое будет имя?");
     }
 
     private void processGetCharacterCommand(Context context, MissionStatus currentStatus) {
@@ -47,11 +57,14 @@ public class CommandService {
         } else {
             String description = charactersService.getPlayableCharacterInfoByPlayerUsername(context.getPlayer().getUsername());
             if(description!=null && description.length()>0) {
-                context.getResponse().setText("Вы уже получили своего персонажа! \n" + description);
+                imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(),
+                        "archetypes/"+context.getPlayer().getCharacter().getArchetype().getCode(),
+                        "Вы уже получили своего персонажа! \n" + description);
             } else {
                 log.info("Ошибка при поиске перснажа игрока {}", context.getPlayer().getUsername());
             }
         }
+        buttonsService.setReplyButtonsAfterGetCharacter(context.getImgResponse());
     }
 
     private void processStartCommand(Context context, MissionStatus currentStatus) throws IOException {

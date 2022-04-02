@@ -1,5 +1,6 @@
 package com.v4bot.ninth.floor.entities;
 
+import com.v4bot.ninth.floor.enums.ReplyType;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -30,6 +31,12 @@ public class Player {
     @OneToOne
     @JoinColumn(name = "character_id")
     private PlayableCharacter character;
+
+    @Column(name="is_replying")
+    private Boolean isReplying;
+
+    @Column(name="reply_type")
+    private ReplyType replyType;
 
     @CreationTimestamp
     @Column(name = "created_at")

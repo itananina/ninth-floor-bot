@@ -21,7 +21,7 @@ public class ImagesService {
         try {
             byte[] imageContent = Files.readAllBytes(Paths.get(ClassLoader.getSystemResource("files/" + path+".png").toURI()));
             ByteArrayInputStream bais = new ByteArrayInputStream(imageContent);
-            InputFile photoSrc = new InputFile(bais, "setting");
+            InputFile photoSrc = new InputFile(bais, "output");
 
             imgOutput.setPhoto(photoSrc);
             imgOutput.setCaption(caption);

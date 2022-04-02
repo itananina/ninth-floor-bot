@@ -3,7 +3,7 @@
 CREATE TABLE indicators (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     score           INTEGER NOT NULL DEFAULT 0,
-    is_locked        INTEGER NOT NULL DEFAULT 0,
+    is_locked       INTEGER NOT NULL DEFAULT 0,
     type            TEXT NOT NULL,
     created_at      timestamp default current_timestamp,
     updated_at      timestamp default current_timestamp
@@ -34,6 +34,7 @@ CREATE TABLE archetypes (
     description     TEXT NOT NULL,
     code            TEXT NOT NULL,
     play_frequency  INTEGER NOT NULL DEFAULT 0,
+    is_playable     INTEGER NOT NULL DEFAULT 0,
     created_at      timestamp default current_timestamp,
     updated_at      timestamp default current_timestamp,
     FOREIGN KEY (state_id) REFERENCES states(id)
@@ -79,6 +80,8 @@ CREATE TABLE players (
     first_name    TEXT NOT NULL,
     last_name     TEXT NOT NULL,
     character_id  INTEGER,
+    is_replying   INTEGER DEFAULT 0,
+    reply_type    TEXT,
     created_at    timestamp default current_timestamp,
     updated_at    timestamp default current_timestamp,
     FOREIGN KEY (character_id) REFERENCES characters(id)

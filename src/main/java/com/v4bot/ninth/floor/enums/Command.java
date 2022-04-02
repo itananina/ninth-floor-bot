@@ -6,7 +6,8 @@ import lombok.AllArgsConstructor;
 public enum Command {
     Start("/start", "Начать игру"),
     GetCharacter("/getCharacter", "Получить игрового персонажа"),
-    Help("/help","Справка");
+    Help("/help","Справка"),
+    ChangeName("/changeName", "Задать имя персонажу");
 
     private String command;
     private String description;

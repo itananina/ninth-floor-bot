@@ -24,6 +24,10 @@ public class ButtonsService {
         setButtons(image, commands);
     }
 
+    public void setReplyButtonsAfterGetCharacter(SendPhoto image) {
+        setButtons(image, new ArrayList<>(Arrays.asList(Command.ChangeName)));
+    }
+
     public void setButtons(SendMessage sendMessage, List<Command> commands) {
         sendMessage.setReplyMarkup(prepareReplyKeyboardMarkup(commands));
     }

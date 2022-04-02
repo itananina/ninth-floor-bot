@@ -30,11 +30,12 @@ public class CharactersService {
         List<Player> players = chatPlayersService.findPlayersByChatId(context.getChatId());
 
         //ищем наименее популярный архетип которого еще нет ни у кого их игроков
-        Optional<Archetype> chosenOpt = archetypesRepository.findAllByOrderByPlayFrequencyAsc().stream()
+        Optional<Archetype> chosenOpt = archetypesRepository.findAllByIsPlayableOrderByPlayFrequencyAsc(true).stream()
             .filter(archetype -> players.stream()
                     .map(Player::getCharacter)
                     .noneMatch(character -> !isNull(character) && !isNull(character.getArchetype()) && archetype.getId().equals(character.getArchetype().getId())))
                 .findFirst();
+        //todo checksum команды
         if(chosenOpt.isPresent()) {
             Archetype chosen = chosenOpt.get();
             chosen.setPlayFrequency(chosen.getPlayFrequency()+1);
@@ -53,7 +54,7 @@ public class CharactersService {
             player.setCharacter(character);
             chatPlayersService.savePlayer(player);
 
-            imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(), "/archetypes/"+chosen.getCode(), prepareArchetypeDescription(chosen));
+            imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(), "archetypes/"+chosen.getCode(), prepareArchetypeDescription(chosen));
             context.getImgResponse().setCaption(prepareArchetypeDescription(chosen));
         } else {
             log.info("Игрок {} не получил персонажа, все архетипы заняты",context.getPlayer().getUsername());
@@ -62,14 +63,21 @@ public class CharactersService {
     }
 
     private String prepareArchetypeDescription(Archetype archetype) {
-        return "Вы " + archetype.getDescription() + "\n"+ archetype.getIndicatorsFormatted();
-        //todo разделять архетипы для неписей и нет
+        return "Вы " + archetype.getName() + "\n" +
+                "Ваш архетип: " + archetype.getDescription() + "\n"+
+                archetype.getIndicatorsFormatted();
+    }
+
+    private String prepareCharacterDescription(PlayableCharacter character) {
+        return "Вы " + character.getName() + "\n" +
+                "Ваш архетип: " + character.getArchetype().getDescription() + "\n"+
+                character.getIndicatorsFormatted();
     }
 
     public String getPlayableCharacterInfoByPlayerUsername(String username) {
         Player player = chatPlayersService.findPlayerByUsername(username);
         if(player.getCharacter()!=null && player.getCharacter().getArchetype() !=null) {
-           return prepareArchetypeDescription(player.getCharacter().getArchetype());
+           return prepareCharacterDescription(player.getCharacter());
         }
         return null;
     }

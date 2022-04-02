@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ArchetypesRepository extends JpaRepository<Archetype, Long> {
-    List<Archetype> findAllByOrderByPlayFrequencyAsc();
+    List<Archetype> findAllByIsPlayableOrderByPlayFrequencyAsc(Boolean isPlayable);
 }

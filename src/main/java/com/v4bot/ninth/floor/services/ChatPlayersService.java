@@ -1,7 +1,9 @@
 package com.v4bot.ninth.floor.services;
 
 import com.v4bot.ninth.floor.entities.Chat;
+import com.v4bot.ninth.floor.entities.PlayableCharacter;
 import com.v4bot.ninth.floor.entities.Player;
+import com.v4bot.ninth.floor.enums.ReplyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -59,5 +61,11 @@ public class ChatPlayersService {
 
     public void savePlayer(Player player) {
         playersRepository.save(player);
+    }
+
+    public void setPlayerReplyingFlag(Player player, Boolean isReplying, ReplyType replyType) {
+        player.setIsReplying(isReplying);
+        player.setReplyType(replyType);
+        savePlayer(player);
     }
 }

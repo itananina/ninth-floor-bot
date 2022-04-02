@@ -3,6 +3,7 @@ package com.v4bot.ninth.floor.controllers;
 import com.v4bot.ninth.floor.data.Context;
 import com.v4bot.ninth.floor.services.CommandService;
 import com.v4bot.ninth.floor.services.ContextService;
+import com.v4bot.ninth.floor.services.ReplyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ public class MessageController extends TelegramLongPollingBot {
 
     private final ContextService contextService;
     private final CommandService commandService;
+    private final ReplyService replyService;
 
     @Override
     public String getBotUsername() {
@@ -44,6 +46,8 @@ public class MessageController extends TelegramLongPollingBot {
                 } catch (Exception e) {
                     log.info("Ошибка при обработке команды {}", context.getMessageText(), e);
                 }
+            } else if (context.getPlayer().getIsReplying()) {
+                replyService.processReply(context);
             } else {
                 //todo отображать кнопки
             }

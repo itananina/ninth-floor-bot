@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "archetypes")
@@ -29,5 +26,8 @@ public class Archetype extends AbstractCharacter {
 
     @Column(name="description")
     private String description;
+
+    @Column(name="is_playable")
+    private Boolean isPlayable;
 
 }

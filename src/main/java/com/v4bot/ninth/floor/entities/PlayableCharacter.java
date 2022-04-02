@@ -19,4 +19,10 @@ public class PlayableCharacter extends AbstractCharacter {
     @JoinColumn(name="archetype_id")
     private Archetype archetype;
 
+    @Column(name="name")
+    private String name;
+
+    public PlayableCharacter(Archetype chosen) {
+        this.archetype = chosen;
+    }
 }
