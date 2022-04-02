@@ -4,7 +4,6 @@ import com.v4bot.ninth.floor.entities.Chat;
 import com.v4bot.ninth.floor.entities.Player;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.User;
 import com.v4bot.ninth.floor.repositories.ChatsRepository;
 import com.v4bot.ninth.floor.repositories.PlayersRepository;
@@ -22,13 +21,14 @@ public class ChatPlayersService {
     private final PlayersRepository playersRepository;
     private final ChatsRepository chatsRepository;
 
-    public void upsertChatMembersByMessageInfo(Message input) {
-        Player player = findOrCreatePlayerByUser(input.getFrom()); //ищем игрока
+    public Player upsertChatPlayerByMessageInfo(User user, Long chatId) {
+        Player player = findOrCreatePlayerByUser(user); //ищем игрока
 
-        if(!isNull(player.getChatSet()) && player.getChatSet().stream().noneMatch(chat -> chat.getId().equals(input.getChatId()))) {
-            Chat chat = findOrCreateChatById(input.getChat()); //ищем чат
+        if(!isNull(player.getChatSet()) && player.getChatSet().stream().noneMatch(chat -> chat.getId().equals(chatId))) {
+            Chat chat = findOrCreateChatById(chatId, user.getUserName()); //ищем чат
             addPlayerToChat(player, chat); //связываем
         }
+        return player;
     }
 
     public Player findOrCreatePlayerByUser(User user) {
@@ -36,9 +36,9 @@ public class ChatPlayersService {
                 .orElseGet(()->playersRepository.save(new Player(user.getUserName(), user.getFirstName(), user.getLastName())));
     }
 
-    public Chat findOrCreateChatById(org.telegram.telegrambots.meta.api.objects.Chat chat) {
-        return chatsRepository.findChatById(chat.getId())
-                .orElseGet(()->chatsRepository.save(new Chat(chat.getId(),chat.getUserName())));
+    public Chat findOrCreateChatById(Long chatId, String primaryUserName) {
+        return chatsRepository.findChatById(chatId)
+                .orElseGet(()->chatsRepository.save(new Chat(chatId,primaryUserName)));
     }
 
     public void addPlayerToChat(Player player, Chat chat) {

@@ -1,5 +1,6 @@
 package com.v4bot.ninth.floor.services;
 
+import com.v4bot.ninth.floor.data.Context;
 import com.v4bot.ninth.floor.entities.*;
 import com.v4bot.ninth.floor.repositories.ArchetypesRepository;
 import com.v4bot.ninth.floor.repositories.PlayableCharactersRepository;
@@ -7,9 +8,6 @@ import com.v4bot.ninth.floor.repositories.StatesRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.Message;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -28,8 +26,8 @@ public class CharactersService {
     private final StatesRepository statesRepository;
     private final PlayableCharactersRepository playableCharactersRepository;
 
-    public void getNewPlayableCharacter(Message input, SendPhoto imgOutput) {
-        List<Player> players = chatPlayersService.findPlayersByChatId(input.getChatId());
+    public void getNewPlayableCharacter(Context context) {
+        List<Player> players = chatPlayersService.findPlayersByChatId(context.getChatId());
 
         //ищем наименее популярный архетип которого еще нет ни у кого их игроков
         Optional<Archetype> chosenOpt = archetypesRepository.findAllByOrderByPlayFrequencyAsc().stream()
@@ -41,7 +39,7 @@ public class CharactersService {
             Archetype chosen = chosenOpt.get();
             chosen.setPlayFrequency(chosen.getPlayFrequency()+1);
 
-            Player player = chatPlayersService.findPlayerByUsername(input.getFrom().getUserName());
+            Player player = chatPlayersService.findPlayerByUsername(context.getPlayer().getUsername());
             PlayableCharacter character = new PlayableCharacter(chosen);
             State state = statesRepository.findById(chosen.getState().getId()).orElse(null);
             if(state!=null) {
@@ -50,15 +48,15 @@ public class CharactersService {
                 character.setState(stateCopy);
                 saveCharacter(character);
             } else {
-                log.info("Не удалось скопировать состяние архетипа при создании игрового персонажа для {}",input.getFrom().getUserName());
+                log.info("Не удалось скопировать состяние архетипа при создании игрового персонажа для {}",context.getPlayer().getUsername());
             }
             player.setCharacter(character);
             chatPlayersService.savePlayer(player);
 
-            imagesService.setPhotoWithCaptionByFilesPath(imgOutput, "/archetypes/"+chosen.getCode(), prepareArchetypeDescription(chosen));
-            imgOutput.setCaption(prepareArchetypeDescription(chosen));
+            imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(), "/archetypes/"+chosen.getCode(), prepareArchetypeDescription(chosen));
+            context.getImgResponse().setCaption(prepareArchetypeDescription(chosen));
         } else {
-            log.info("Игрок {} не получил персонажа, все архетипы заняты", input.getFrom().getUserName());
+            log.info("Игрок {} не получил персонажа, все архетипы заняты",context.getPlayer().getUsername());
             //todo если все архетипы заняты
         }
     }

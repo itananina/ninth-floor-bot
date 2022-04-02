@@ -1,32 +1,23 @@
 package com.v4bot.ninth.floor.controllers;
 
-import com.v4bot.ninth.floor.services.ButtonsService;
-import com.v4bot.ninth.floor.services.CharactersService;
+import com.v4bot.ninth.floor.data.Context;
 import com.v4bot.ninth.floor.services.CommandService;
+import com.v4bot.ninth.floor.services.ContextService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import com.v4bot.ninth.floor.services.ChatPlayersService;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class MessageController extends TelegramLongPollingBot {
 
+    private final ContextService contextService;
     private final CommandService commandService;
 
     @Override
@@ -45,27 +36,23 @@ public class MessageController extends TelegramLongPollingBot {
         if (update.hasMessage() && update.getMessage().hasText()) {
             final Message input = update.getMessage();
 
-            SendMessage message = new SendMessage(); // Create a SendMessage and SendPhoto objects with mandatory fields
-            message.setChatId(input.getChatId().toString());
-            SendPhoto image = new SendPhoto();
-            image.setChatId(input.getChatId().toString());
+            Context context = contextService.setContext(input); //заполняем контекст
 
-            if(input.getText().startsWith("/")) {
+            if(context.getMessageText().startsWith("/")) {
                 try {
-                    commandService.processCommand(input, message, image);
+                    commandService.processCommand(context);
                 } catch (Exception e) {
-                    log.info("Ошибка при обработке команды /start", e);
+                    log.info("Ошибка при обработке команды {}", context.getMessageText(), e);
                 }
-
             } else {
                 //todo отображать кнопки
             }
 
             try {
-                if(message.getText()!=null) {
-                    execute(message);
-                } else if(image.getPhoto()!=null) {
-                    execute(image);
+                if(context.getResponse().getText()!=null) {
+                    execute(context.getResponse());
+                } else if(context.getImgResponse().getPhoto()!=null) {
+                    execute(context.getImgResponse());
                 }
             } catch (TelegramApiException e) {
                 e.printStackTrace();
