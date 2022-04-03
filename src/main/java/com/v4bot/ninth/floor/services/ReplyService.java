@@ -1,31 +1,21 @@
 package com.v4bot.ninth.floor.services;
 
 import com.v4bot.ninth.floor.data.Context;
-import com.v4bot.ninth.floor.entities.PlayableCharacter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
-public class ReplyService {
-    private final CharactersService charactersService;
-    private final ChatPlayersService chatPlayersService;
+public class ReplyService implements ReplyProcessor {
 
+    private final Map<String, ReplyProcessor> replyProcessorsMap;
+
+    @Override
     public void processReply(Context context) {
-        switch (context.getPlayer().getReplyType()) {
-            case ChangeName:
-                processChangeNameReply(context);
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void processChangeNameReply(Context context) {
-        PlayableCharacter character = context.getPlayer().getCharacter();
-        character.setName(context.getMessageText());
-        charactersService.saveCharacter(character);
-
-        chatPlayersService.setPlayerReplyingFlag(context.getPlayer(), false, null);
+        Optional.ofNullable(replyProcessorsMap.get(context.getPlayer().getReplyType().getCommand()))
+                .ifPresent(processor-> processor.processReply(context));
     }
 }
