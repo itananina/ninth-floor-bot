@@ -28,7 +28,7 @@ public class ChangeNameProcessor implements CommandProcessor, ReplyProcessor {
         PlayableCharacter character = context.getPlayer().getCharacter();
         character.setName(context.getMessageText());
         charactersService.saveCharacter(character);
-
         chatPlayersService.setPlayerReplyingFlag(context.getPlayer(), false, null);
+        charactersService.getPlayableCharacterInfoByPlayerUsername(context, "Имя обновлено!");
     }
 }

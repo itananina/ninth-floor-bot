@@ -69,17 +69,28 @@ public class CharactersService {
     }
 
     private String prepareCharacterDescription(PlayableCharacter character) {
-        return "Вы " + character.getName() + "\n" +
-                "Ваш архетип: " + character.getArchetype().getDescription() + "\n"+
+        return  character.getName() + "\n" +
+                "Архетип: " + character.getArchetype().getDescription() + "\n"+
                 character.getIndicatorsFormatted();
     }
 
-    public String getPlayableCharacterInfoByPlayerUsername(String username) {
+    private String getPlayableCharacterInfoByPlayerUsername(String username) {
         Player player = chatPlayersService.findPlayerByUsername(username);
         if(player.getCharacter()!=null && player.getCharacter().getArchetype() !=null) {
            return prepareCharacterDescription(player.getCharacter());
         }
         return null;
+    }
+
+    public void getPlayableCharacterInfoByPlayerUsername(Context context, String addedText) {
+        String description = getPlayableCharacterInfoByPlayerUsername(context.getPlayer().getUsername());
+        if(description!=null && description.length()>0) {
+            imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(),
+                    "archetypes/"+context.getPlayer().getCharacter().getArchetype().getCode(),
+                    (addedText!=null? addedText + "\n": "") + description);
+        } else {
+            log.info("Ошибка при поиске перснажа игрока {}", context.getPlayer().getUsername());
+        }
     }
 
     public void saveCharacter(PlayableCharacter character) {

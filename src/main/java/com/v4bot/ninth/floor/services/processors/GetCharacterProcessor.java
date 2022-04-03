@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class GetCharacterProcessor implements CommandProcessor {
     private final MissionService missionService;
     private final CharactersService charactersService;
-    private final ImagesService imagesService;
     private final ButtonsService buttonsService;
 
     @Override
@@ -24,14 +23,7 @@ public class GetCharacterProcessor implements CommandProcessor {
         if(MissionStatus.Absent.equals(currentStatus) && context.getPlayer().getCharacter()==null) {
             charactersService.getNewPlayableCharacter(context);
         } else {
-            String description = charactersService.getPlayableCharacterInfoByPlayerUsername(context.getPlayer().getUsername());
-            if(description!=null && description.length()>0) {
-                imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(),
-                        "archetypes/"+context.getPlayer().getCharacter().getArchetype().getCode(),
-                        "Вы уже получили своего персонажа! \n" + description);
-            } else {
-                log.info("Ошибка при поиске перснажа игрока {}", context.getPlayer().getUsername());
-            }
+            charactersService.getPlayableCharacterInfoByPlayerUsername(context, "Вы уже получили своего персонажа!");
         }
         buttonsService.setReplyButtonsAfterGetCharacter(context.getImgResponse());
     }
