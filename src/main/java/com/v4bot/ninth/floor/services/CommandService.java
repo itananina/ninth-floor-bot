@@ -1,7 +1,6 @@
 package com.v4bot.ninth.floor.services;
 
 import com.v4bot.ninth.floor.data.Context;
-import com.v4bot.ninth.floor.enums.Command;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,17 +14,11 @@ import java.util.*;
 @Slf4j
 public class CommandService implements CommandProcessor {
 
-    private final List<CommandProcessor> processorList;
+    private final Map<String, CommandProcessor> processorMap;
 
     @Override
     public void processCommand(Context context) {
-        Arrays.stream(Command.values())
-                .filter(command -> context.getMessageText().split("\\s+", 1)[0].toLowerCase(Locale.ROOT).equals(command.getCommand().toLowerCase(Locale.ROOT)))
-                .findFirst()
-                .flatMap(command -> processorList.stream()
-                        .filter(processor -> command.getCommandProcessor().equals(processor.getClass()))
-                        .findFirst())
-                .ifPresent(processor -> processor.processCommand(context));
-
+        Optional.ofNullable(processorMap.get(context.getMessageText().split("\\s+", 1)[0].toLowerCase(Locale.ROOT)))
+                .ifPresent(processor-> processor.processCommand(context));
     }
 }

@@ -1,13 +1,14 @@
 package com.v4bot.ninth.floor.services.processors;
 
 import com.v4bot.ninth.floor.data.Context;
+import com.v4bot.ninth.floor.enums.Command;
 import com.v4bot.ninth.floor.enums.MissionStatus;
 import com.v4bot.ninth.floor.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component(Command.GETCHARACTER)
 @RequiredArgsConstructor
 @Slf4j
 public class GetCharacterProcessor implements CommandProcessor {

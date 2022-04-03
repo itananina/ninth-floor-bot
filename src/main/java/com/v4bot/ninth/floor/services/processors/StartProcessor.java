@@ -1,6 +1,7 @@
 package com.v4bot.ninth.floor.services.processors;
 
 import com.v4bot.ninth.floor.data.Context;
+import com.v4bot.ninth.floor.enums.Command;
 import com.v4bot.ninth.floor.enums.MissionStatus;
 import com.v4bot.ninth.floor.services.ButtonsService;
 import com.v4bot.ninth.floor.services.CommandProcessor;
@@ -14,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.Objects;
 
-@Component
+@Component(Command.START)
 @RequiredArgsConstructor
 @Slf4j
 public class StartProcessor implements CommandProcessor {
