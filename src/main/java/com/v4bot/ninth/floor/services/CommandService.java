@@ -1,81 +1,31 @@
 package com.v4bot.ninth.floor.services;
 
 import com.v4bot.ninth.floor.data.Context;
-import com.v4bot.ninth.floor.enums.MissionStatus;
-import com.v4bot.ninth.floor.enums.ReplyType;
+import com.v4bot.ninth.floor.enums.Command;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.io.File;
-import java.io.IOException;
-import java.util.Locale;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 @Slf4j
-public class CommandService {
+public class CommandService implements CommandProcessor {
 
-    private final ChatPlayersService chatPlayersService;
-    private final CharactersService charactersService;
-    private final ButtonsService buttonsService;
-    private final MissionService missionService;
-    private final ImagesService imagesService;
+    private final List<CommandProcessor> processorList;
 
-    public void processCommand(Context context) throws Exception {
-        MissionStatus currentStatus = missionService.getMissionStatusForChat(context.getChatId());
+    @Override
+    public void processCommand(Context context) {
+        Arrays.stream(Command.values())
+                .filter(command -> context.getMessageText().split("\\s+", 1)[0].toLowerCase(Locale.ROOT).equals(command.getCommand().toLowerCase(Locale.ROOT)))
+                .findFirst()
+                .flatMap(command -> processorList.stream()
+                        .filter(processor -> command.getCommandProcessor().equals(processor.getClass()))
+                        .findFirst())
+                .ifPresent(processor -> processor.processCommand(context));
 
-        //todo присобачить проверку через Command enum
-        switch (context.getMessageText().split("\\s+", 1)[0].toLowerCase(Locale.ROOT)) {
-            case "/start":
-                processStartCommand(context, currentStatus);
-                break;
-            case "/getcharacter":
-                processGetCharacterCommand(context, currentStatus);
-                break;
-            case "/changename":
-                processChangeNameCommand(context);
-                break;
-            default:
-                break;
-        }
-//            buttonsService.setButtons(message);
-    }
-
-    private void processChangeNameCommand(Context context) {
-        chatPlayersService.setPlayerReplyingFlag(context.getPlayer(), true, ReplyType.ChangeName);
-        context.getResponse().setText("Какое будет имя?");
-    }
-
-    private void processGetCharacterCommand(Context context, MissionStatus currentStatus) {
-        if(MissionStatus.Absent.equals(currentStatus) && context.getPlayer().getCharacter()==null) {
-            charactersService.getNewPlayableCharacter(context);
-        } else {
-            String description = charactersService.getPlayableCharacterInfoByPlayerUsername(context.getPlayer().getUsername());
-            if(description!=null && description.length()>0) {
-                imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(),
-                        "archetypes/"+context.getPlayer().getCharacter().getArchetype().getCode(),
-                        "Вы уже получили своего персонажа! \n" + description);
-            } else {
-                log.info("Ошибка при поиске перснажа игрока {}", context.getPlayer().getUsername());
-            }
-        }
-        buttonsService.setReplyButtonsAfterGetCharacter(context.getImgResponse());
-    }
-
-    private void processStartCommand(Context context, MissionStatus currentStatus) throws IOException {
-        if(MissionStatus.Absent.equals(currentStatus)) {
-            File file = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("files/setting.txt")).getFile());
-            String caption = FileUtils.readFileToString(file, "UTF-8");
-
-            imagesService.setPhotoWithCaptionByFilesPath(context.getImgResponse(), "setting", caption);
-            buttonsService.setReplyButtonsAfterStart(context.getImgResponse());
-        } else {
-            context.getResponse().setText("Игра уже начата!"); //todo инфо об игре
-        }
     }
 }
