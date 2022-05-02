@@ -20,7 +20,7 @@ public class GetCharacterProcessor implements CommandProcessor {
     public void processCommand(Context context) {
         MissionStatus currentStatus = missionService.getMissionStatusForChat(context.getChatId());
 
-        if(MissionStatus.Absent.equals(currentStatus) && context.getPlayer().getCharacter()==null) {
+        if(MissionStatus.Absent.equals(currentStatus) && context.getPlayer()!=null && context.getPlayer().getCharacter()==null) {
             charactersService.getNewPlayableCharacter(context);
         } else {
             charactersService.getPlayableCharacterInfoByPlayerUsername(context, "Вы уже получили своего персонажа!");
