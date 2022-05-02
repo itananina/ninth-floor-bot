@@ -20,8 +20,8 @@ public class ImagesService {
     public void setPhotoWithCaptionByFilesPath(SendPhoto imgOutput, String path, String caption) {
         try {
             byte[] imageContent = Files.readAllBytes(Paths.get(ClassLoader.getSystemResource("files/" + path+".png").toURI()));
-            ByteArrayInputStream bais = new ByteArrayInputStream(imageContent);
-            InputFile photoSrc = new InputFile(bais, "output");
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageContent);
+            InputFile photoSrc = new InputFile(byteArrayInputStream, "output");
 
             imgOutput.setPhoto(photoSrc);
             imgOutput.setCaption(caption);

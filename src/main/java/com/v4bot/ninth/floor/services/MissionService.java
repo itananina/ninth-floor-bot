@@ -21,7 +21,7 @@ public class MissionService {
         if(missionList.isEmpty()) {
             return null;
         }
-        return missionList.stream().filter(mission -> MissionStatus.Active.equals(mission.getStatus())).findFirst().orElse(null);
+        return missionList.stream().filter(mission -> mission!=null && MissionStatus.Active.equals(mission.getStatus())).findFirst().orElse(null);
     }
 
     public MissionStatus getMissionStatusForChat(Long chatId) {
@@ -29,7 +29,7 @@ public class MissionService {
         if(missionList.isEmpty()) {
             return MissionStatus.Absent;
         }
-        Optional<Mission> missionOpt = missionList.stream().filter(mission -> MissionStatus.Active.equals(mission.getStatus())).findFirst();
+        Optional<Mission> missionOpt = missionList.stream().filter(mission -> mission!=null && MissionStatus.Active.equals(mission.getStatus())).findFirst();
         return missionOpt.isPresent() ? missionOpt.get().getStatus() : MissionStatus.Finished;
     }
 }

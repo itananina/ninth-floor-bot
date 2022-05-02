@@ -15,7 +15,7 @@ public class ReplyService implements ReplyProcessor {
 
     @Override
     public void processReply(Context context) {
-        Optional.ofNullable(replyProcessorsMap.get(context.getPlayer().getReplyType().getCommand()))
+        Optional.ofNullable(replyProcessorsMap.get(context!=null && context.getPlayer()!=null && context.getPlayer().getReplyType()!=null ? context.getPlayer().getReplyType().getCommand() : null))
                 .ifPresent(processor-> processor.processReply(context));
     }
 }

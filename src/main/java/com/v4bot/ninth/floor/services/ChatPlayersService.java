@@ -1,7 +1,6 @@
 package com.v4bot.ninth.floor.services;
 
 import com.v4bot.ninth.floor.entities.Chat;
-import com.v4bot.ninth.floor.entities.PlayableCharacter;
 import com.v4bot.ninth.floor.entities.Player;
 import com.v4bot.ninth.floor.enums.ReplyType;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +25,7 @@ public class ChatPlayersService {
     public Player upsertChatPlayerByMessageInfo(User user, Long chatId) {
         Player player = findOrCreatePlayerByUser(user); //ищем игрока
 
-        if(!isNull(player.getChatSet()) && player.getChatSet().stream().noneMatch(chat -> chat.getId().equals(chatId))) {
+        if(!isNull(player) && !isNull(player.getChatSet()) && player.getChatSet().stream().noneMatch(chat -> chat.getId().equals(chatId))) {
             Chat chat = findOrCreateChatById(chatId, user.getUserName()); //ищем чат
             addPlayerToChat(player, chat); //связываем
         }
